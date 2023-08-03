@@ -14,23 +14,10 @@ scikit-image==0.16.2
 tqdm==4.45.0
 ```
 
-## Signal map information is formatted as PNG file one pixel representing on signal cells. 
-
-* red vulnerable cell 
-* magenta no-fly cell
-* orange heavy traffic areas
-* blue	driving road (EV moves)
-* yellow ABS depot
-
-The tester can create a new map by any tool which can generate PNG with above color codes.
-
-The terrestrial map to know line-of-sight (LoS) or non-line-of-sight (NLoS) info can be based on a pre-defined map as in remotedriving.npy (Shadowing file)
-
-
 
 ## How to use
 
-Train a new model with your map (in the image folder).
+Train a new model with your signal map (build via image pixel).
 
 ```
 python train.py --gpu --config config/remotedriving.json --id signal-map
