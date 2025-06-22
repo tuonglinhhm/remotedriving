@@ -1,0 +1,44 @@
+      \begin{table*}[t]
+   \centering
+     \caption{\textcolor{blue}{An overview of the main variables' influence on the effectiveness of three typical UAV flight optimization approaches.}}
+    \label{tab:influence-summary}
+  \begin{adjustbox}{width=1\textwidth}
+    \small   
+\begin{tabular}{lllllllllll}
+\hline
+\rowcolor[HTML]{EFEFEF} 
+\multicolumn{2}{l}{\cellcolor[HTML]{EFEFEF}} & \multicolumn{3}{c}{\cellcolor[HTML]{EFEFEF}\textbf{Proposed Search}} & \multicolumn{3}{c}{\cellcolor[HTML]{EFEFEF}\textbf{DGRL}} & \multicolumn{3}{c}{\cellcolor[HTML]{EFEFEF}\textbf{MUFO}} \\ \cline{3-11} 
+\multicolumn{2}{l}{\multirow{-2}{*}{\cellcolor[HTML]{EFEFEF}\textbf{Paramter}}} & \cellcolor[HTML]{EFEFEF}\textit{\# of UAVs} & \cellcolor[HTML]{EFEFEF}\textit{Energy consumption} & \cellcolor[HTML]{EFEFEF}\textit{Overall cost} & \cellcolor[HTML]{EFEFEF}\textit{\# of UAVs} & \cellcolor[HTML]{EFEFEF}\textit{Energy consumption} & \cellcolor[HTML]{EFEFEF}\textit{Overall cost} & \cellcolor[HTML]{EFEFEF}\textit{\# of UAVs} & \cellcolor[HTML]{EFEFEF} \textit{Energy consumption} & \cellcolor[HTML]{EFEFEF} \textit{Overall cost} \\ \hline
+\rowcolor[HTML]{FFFFFF} 
+\begin{tabular}[c]{@{}l@{}}$N$ remote driving requests\end{tabular} & \begin{tabular}[c]{@{}l@{}} \end{tabular}& \begin{tabular}[c]{@{}l@{}} $M \times V$ \end{tabular} & \begin{tabular}[c]{@{}l@{}}$O$($M \times  N \times  V$)\end{tabular} & Medium& \begin{tabular}[c]{@{}l@{}}$\Omega (25+M)N$\end{tabular} & \begin{tabular}[c]{@{}l@{}}$O$ ($M \times N \times T \times \Gamma$ $\times O^{Q}$) \end{tabular} & \begin{tabular}[c]{@{}l@{}} Medium\end{tabular} & \begin{tabular}[c]{@{}l@{}}$\Omega(25+ M)N$\end{tabular} & \begin{tabular}[c]{@{}l@{}}$O$ ( $M \times N \times T \times  \Gamma \times O^{D}$)\end{tabular} & \begin{tabular}[c]{@{}l@{}} High\end{tabular} \\
+\rowcolor[HTML]{EFEFEF} 
+\cellcolor[HTML]{EFEFEF} & \textbf{1} & - & - & - & - & - & - & - & - & - \\
+\rowcolor[HTML]{EFEFEF} 
+\multirow{-2}{*}{\cellcolor[HTML]{EFEFEF}\# of UAV depot} & 4 & $\downarrow$ & $\downarrow$ & $\uparrow$ & $\downarrow$ & $\uparrow$ & $\uparrow$ & $\downarrow$ & $\downarrow$ & $\uparrow$ \\
+
+ & 5 & $\uparrow$ & $\uparrow$ & $\downarrow$ & $\uparrow$ & $\uparrow$ & $\rightarrow$ & $\uparrow$ & $\uparrow$ & $\rightarrow$ \\
+
+\multirow{-2}{*}{\begin{tabular}[c]{@{}l@{}}$d_{max}$ (m)\end{tabular}} & \textbf{20} & - & - & - & - & - & - & - & - & - \\
+\rowcolor[HTML]{EFEFEF} 
+\cellcolor[HTML]{EFEFEF} & 10 & - & - & $\downarrow$ & - & - & $\downarrow$ & - & - & $\downarrow$ \\
+\rowcolor[HTML]{EFEFEF} 
+\multirow{-2}{*}{\cellcolor[HTML]{EFEFEF}\begin{tabular}[c]{@{}l@{}}UAV max. speed (m/s)\end{tabular}} & \textbf{20} & - & - & - & - & - & - & - & - & - \\
+
+ & 1 & - & - & - & - & - & - & - & - & $\downarrow$ \\
+
+\multirow{-2}{*}{\begin{tabular}[c]{@{}l@{}}Multi-access per UAV\end{tabular}} & \textbf{2} & - & - & - & - & - & $\uparrow$ & - & - & $\uparrow$ \\
+\rowcolor[HTML]{EFEFEF} 
+\cellcolor[HTML]{EFEFEF} & 10k & - & - & $\downarrow$ & - & - & $\downarrow$ & - & - & $\downarrow$ \\
+\rowcolor[HTML]{EFEFEF} 
+\multirow{-2}{*}{\cellcolor[HTML]{EFEFEF}\begin{tabular}[c]{@{}l@{}}Battery capacity (mAh)\end{tabular}} & \textbf{20k} & - & - & - & - & - & - & - & - & - \\
+\rowcolor[HTML]{FFFFFF} 
+\cellcolor[HTML]{FFFFFF} & 100 & - & - & $\downarrow$ & - & - & $\downarrow$ & - & - & $\downarrow$ \\
+\rowcolor[HTML]{FFFFFF} 
+\multirow{-2}{*}{\cellcolor[HTML]{FFFFFF}\begin{tabular}[c]{@{}l@{}}UAV service range (m)\end{tabular}} & \textbf{500} & - & - & - & - & - & - & - & - & - \\ \hline
+\end{tabular}
+\end{adjustbox}
+ \begin{tablenotes}
+        \item *$\downarrow$ indicates a drop, $\uparrow$ a rise; the minus symbol $-$ indicates no change or the status quo; $\rightarrow$ indicates no appreciable gain;
+\end{tablenotes}
+\end{table*}
+  
