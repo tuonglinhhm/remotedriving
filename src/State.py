@@ -255,9 +255,9 @@ class State(BaseState):
         Construct the full state space vector (Definition 6) with the current UAV as reference.
         """
         
-        Construct the normalized state column vector following the new definition:
+        #Construct the normalized state column vector following the new definition:
 
-        s_m^t = [D_m^t, E_m^t, P_m^t, P^t_m, p^t_{m,1}, q^t_{m,1}, ..., p^t_{m,N}, q^t_{m,N}]^T
+       # state_vector = [D_m^t, E_m^t, P_m^t, P^t_m, p^t_{m,1}, q^t_{m,1}, ..., p^t_{m,N}, q^t_{m,N}]^T
 
        # The vector contains the distance to the base station, remaining movement budget, transmit power, connectivity indicator, and the (x, y) coordinates of each served vehicle. All components are normalized to fall within [0, 1] and returned as a column matrix with shape (4 + 2N, 1).
         
