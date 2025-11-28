@@ -9,7 +9,8 @@ class GridPhysics:
 
     def movement_step(self, action: GridActions):
         old_position = self.state.position
-        x, y, z = old_position
+        x, y = old_position[0], old_position[1]
+        z = self.state.altitude
 
         if action == GridActions.STEP1:
             x += 0

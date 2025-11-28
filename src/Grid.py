@@ -63,7 +63,7 @@ class Grid(BaseGrid):
         else:
             # Replace False insures that starting positions of the agents are different
             idx = np.random.choice(len(self.starting_vector), size=self.num_agents, replace=False)
-        state.positions = [self.starting_vector[i] for i in idx]
+        state.positions = [list(self.starting_vector[i]) + [0] for i in idx]
 
         state.movement_budgets = np.random.randint(low=self.params.movement_range[0],
                                                    high=self.params.movement_range[1] + 1, size=self.num_agents)
