@@ -232,11 +232,59 @@ class State(BaseState):
         if not self.device_list:
             return []
         return [self._normalize_position(device.position) for device in self.device_list.devices]
+        
+    def _normalize_position(self, position):
+        """
+        Clamp and coerce a position vector so that it lies inside the grid and always
+        contains three coordinates. The x/y components are clipped to the grid
+        boundaries and rounded to integers; the optional z component defaults to 0.
+        """
+
+        if len(position) == 2:
+            x, y = position
+            z = 0
+        else:
+            x, y, z = position
+
+        x = int(np.clip(round(x), 0, self.no_fly_zone.shape[1] - 1))
+        y = int(np.clip(round(y), 0, self.no_fly_zone.shape[0] - 1))
+        return [x, y, z]
 
     def get_state_space(self, bs_threshold, service_threshold):
         """
         Construct the full state space vector (Definition 6) with the current UAV as reference.
         """
+        
+        Construct the normalized state column vector following the new definition:
+
+        s_m^t = [D_m^t, E_m^t, P_m^t, P^t_m, p^t_{m,1}, q^t_{m,1}, ..., p^t_{m,N}, q^t_{m,N}]^T
+
+       # The vector contains the distance to the base station, remaining movement budget, transmit power, connectivity indicator, and the (x, y) coordinates of each served vehicle. All components are normalized to fall within [0, 1] and returned as a column matrix with shape (4 + 2N, 1).
+        
+        # Normalize scalar components
+        max_distance = np.linalg.norm([self.no_fly_zone.shape[1], self.no_fly_zone.shape[0], 1])
+        distance_to_bs = self.get_distance_to_base_station() / max(max_distance, 1e-9)
+
+        max_budget = max(float(self.initial_movement_budget), 1e-9)
+        normalized_budget = float(self.movement_budget) / max_budget
+
+        connectivity_flag = self.get_connectivity_indicator(bs_threshold)
+
+        vehicle_positions = self.get_vehicle_locations()
+        num_devices = len(vehicle_positions)
+
+        state_vector = np.zeros((4 + 2 * num_devices, 1), dtype=float)
+        state_vector[0] = distance_to_bs
+        state_vector[1] = normalized_budget
+        state_vector[2] = float(self.transmit_power)
+        state_vector[3] = connectivity_flag
+
+        width = max(self.no_fly_zone.shape[1] - 1, 1)
+        height = max(self.no_fly_zone.shape[0] - 1, 1)
+        for idx, (x, y, *_) in enumerate(vehicle_positions):
+            state_vector[4 + 2 * idx] = float(x) / width
+            state_vector[4 + 2 * idx + 1] = float(y) / height
+            
         return {
             's1': np.array(self.position, dtype=float),
             's2': float(self.movement_budget),
@@ -250,6 +298,6 @@ class State(BaseState):
             's7': self.get_distance_to_served_vehicle(),
             's8': self.get_service_coverage_flag(),
             's9': self.get_vehicle_locations(),
-            'service_threshold': service_threshold,
+            'service_threshold': state_vector,
         }
 
