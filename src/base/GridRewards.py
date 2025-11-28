@@ -4,8 +4,8 @@ from src.base.GridActions import GridActions
 class GridRewardParams:
     def __init__(self):
         self.low_energy = 1.0
-        self.collison_1 = 10.0
-        self.collison_2 = 10.0
+        self.collision_1 = 10.0
+        self.collision_2 = 10.0
         self.overload = 1.0
         self.loss = 100.0
         self.ceiling = 1
@@ -25,16 +25,17 @@ class GridRewards:
 
     def calculate_motion_rewards(self, state, action: GridActions, next_state):
         reward = 0.0
-        if not next_state.coverage:
-           # Penalize condition as stated in the manuscript
-            reward -= (self.params.low_energy + self.params.collison_1 +  self.params.collison_2 + self.params.overload +  self.params.loss + self.params.ceiling +  self.params.empty_battery_penalty + 
 
-        if state.position == next_state.position and not next_state.coverage and not action == GridActions.SIR3
+        # Penalize repeated hovering when the UAV is not serving anything.
+        if state.position == next_state.position and not next_state.coverage and action != GridActions.SIR3:
             reward -= self.params.ceiling
 
-        # Penalize battery dead
-        if next_state.movement_budget == 0 and not next_state.coverage:
+        # Penalize depleted battery.
+        if hasattr(next_state, "movement_budget") and next_state.movement_budget == 0 and not next_state.coverage:
             reward -= self.params.empty_battery_penalty
+
+        # Small per-move penalty to discourage unnecessary motion.
+        reward -= self.params.movement_penalty
 
         return reward
 

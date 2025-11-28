@@ -83,7 +83,7 @@ class UAVEnv(object):
     def step(self, action):  
         step_redo = False
         is_terminal = False
-        remote-mission_ratio_change = False
+        remote_mission_ratio_change = False
         reset_dist = False
         action = (action + 1) / 2  
         if action[0] == 1:
@@ -92,7 +92,7 @@ class UAVEnv(object):
             ue_id = int(self.M * action[0])
 
         theta = action[1] * np.pi * 2  
-        remote-mission_ratio = action[3]  
+        remote_mission_ratio = action[3]
         task_size = self.task_list[ue_id]
         block_flag = self.block_flag_list[ue_id]
 
@@ -108,7 +108,7 @@ class UAVEnv(object):
         loc_uav_after_fly_y = self.loc_uav[1] + dy_uav
 
        
-        t_server = remote-mission_ratio * task_size / (self.f_uav / self.s)  
+        t_server = remote_mission_ratio * task_size / (self.f_uav / self.s)
         e_server = self.r * self.f_uav ** 3 * t_server  
 
         if self.sum_task_size == 0: 
@@ -121,32 +121,32 @@ class UAVEnv(object):
         elif loc_uav_after_fly_x < 0 or loc_uav_after_fly_x > self.ground_width or loc_uav_after_fly_y < 0 or loc_uav_after_fly_y > self.ground_length:  # uav位置不对
             
             reset_dist = True
-            delay = self.com_delay(self.loc_ue_list[ue_id], self.loc_uav, remote-mission_ratio, task_size, block_flag)  # 计算delay
+            delay = self.com_delay(self.loc_ue_list[ue_id], self.loc_uav, remote_mission_ratio, task_size, block_flag)  # 计算delay
             reward = -delay
            
             self.e_battery_uav = self.e_battery_uav - e_server  
-            self.reset2(delay, self.loc_uav[0], self.loc_uav[1], remote-mission_ratio, task_size, ue_id)
+            self.reset2(delay, self.loc_uav[0], self.loc_uav[1], remote_mission_ratio, task_size, ue_id)
         elif self.e_battery_uav < e_fly or self.e_battery_uav - e_fly < e_server:  
             delay = self.com_delay(self.loc_ue_list[ue_id], np.array([loc_uav_after_fly_x, loc_uav_after_fly_y]),
                                    0, task_size, block_flag) 
             reward = -delay
             self.reset2(delay, loc_uav_after_fly_x, loc_uav_after_fly_y, 0, task_size, ue_id)
-            remote-mission_ratio_change = True
+            remote_mission_ratio_change = True
         else: 
             delay = self.com_delay(self.loc_ue_list[ue_id], np.array([loc_uav_after_fly_x, loc_uav_after_fly_y]),
-                                   remote-mission_ratio, task_size, block_flag)  
+                                   remote_mission_ratio, task_size, block_flag)
             reward = -delay
             
             self.e_battery_uav = self.e_battery_uav - e_fly - e_server 
             self.loc_uav[0] = loc_uav_after_fly_x  
             self.loc_uav[1] = loc_uav_after_fly_y
-            self.reset2(delay, loc_uav_after_fly_x, loc_uav_after_fly_y, remote-mission_ratio, task_size,
+            self.reset2(delay, loc_uav_after_fly_x, loc_uav_after_fly_y, remote_mission_ratio, task_size,
                                            ue_id)   
 
-        return self._get_obs(), reward, is_terminal, step_redo, remote-mission_ratio_change, reset_dist
+        return self._get_obs(), reward, is_terminal, step_redo, remote_mission_ratio_change, reset_dist
 
    
-    def reset2(self, delay, x, y, remote-mission_ratio, task_size, ue_id):
+    def reset2(self, delay, x, y, remote_mission_ratio, task_size, ue_id):
         self.sum_task_size -= self.task_list[ue_id]  
         for i in range(self.M):  
             tmp = np.random.rand(2)
@@ -160,13 +160,13 @@ class UAVEnv(object):
         file_name = 'output.txt'
      
         with open(file_name, 'a') as file_obj:
-            file_obj.write("\nUE-" + '{:d}'.format(ue_id) + ", task size: " + '{:d}'.format(int(task_size)) + ", remote-mission ratio:" + '{:.2f}'.format(remote-mission_ratio))
+            file_obj.write("\nUE-" + '{:d}'.format(ue_id) + ", task size: " + '{:d}'.format(int(task_size)) + ", remote-mission ratio:" + '{:.2f}'.format(remote_mission_ratio))
             file_obj.write("\ndelay:" + '{:.2f}'.format(delay))
             file_obj.write("\nUAV hover loc:" + "[" + '{:.2f}'.format(x) + ', ' + '{:.2f}'.format(y) + ']') 
 
 
     
-    def com_delay(self, loc_ue, loc_uav, remote-mission_ratio, task_size, block_flag):
+    def com_delay(self, loc_ue, loc_uav, remote_mission_ratio, task_size, block_flag):
         dx = loc_uav[0] - loc_ue[0]
         dy = loc_uav[1] - loc_ue[1]
         dh = self.height
@@ -176,9 +176,9 @@ class UAVEnv(object):
             p_noise = self.p_noisy_nlos
         g_uav_ue = abs(self.alpha0 / dist_uav_ue ** 2)  
         trans_rate = self.B * math.log2(1 + self.p_uplink * g_uav_ue / p_noise)  
-        t_tr = remote-mission_ratio * task_size / trans_rate 
-        t_edge_com = remote-mission_ratio * task_size / (self.f_uav / self.s)  
-        t_local_com = (1 - remote-mission_ratio) * task_size / (self.f_ue / self.s)  
+        t_tr = remote_mission_ratio * task_size / trans_rate
+        t_edge_com = remote_mission_ratio * task_size / (self.f_uav / self.s)
+        t_local_com = (1 - remote_mission_ratio) * task_size / (self.f_ue / self.s)
         if t_tr < 0 or t_edge_com < 0 or t_local_com < 0:
             raise Exception(print("+++++++++++++++++!! error !!+++++++++++++++++++++++"))
         return max([t_tr + t_edge_com, t_local_com])  

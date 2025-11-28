@@ -9,52 +9,47 @@ class GridPhysics:
 
     def movement_step(self, action: GridActions):
         old_position = self.state.position
-        x, y, z = old_position
+        x, y = old_position[0], old_position[1]
+        z = self.state.altitude
 
+        # Simple grid motion model based on the provided direction.
         if action == GridActions.STEP1:
-            x += 0
-            y += 0
+            pass
         elif action == GridActions.STEP2:
-            x += 100
-            y += 100
+            x += 1
+            y += 1
         elif action == GridActions.DIR1:
-            x += 0
-            y += -100
+            y -= 1
         elif action == GridActions.DIR2:
-            x += 0
-            y += 100
+            y += 1
         elif action == GridActions.DIR3:
-            x += 50
-            y += 50
+            x += 1
+            y += 1
         elif action == GridActions.DIR4:
-            x += 50
-            y += 50
+            x += 1
         elif action == GridActions.DIR5:
-            x += 50
-            y += -50
+            x += 1
+            y -= 1
         elif action == GridActions.DIR6:
-            x += -50
-            y += 50  
+            x -= 1
+            y += 1
         elif action == GridActions.DIR7:
-            x += -50
-            y += -50
+            x -= 1
+            y -= 1
         elif action == GridActions.DIR8:
-            x += -100
-            y += 0
+            x -= 1
         elif action == GridActions.LIF1:
-            Z += -5
+            z -= 1
         elif action == GridActions.LIF2:
-            z += 0
+            pass
         elif action == GridActions.LIF3:
-            z += 5
-        elif action == GridActions.SIR1:
-           self.coverage += 1
-           self.state.set_position([x, y, z])
-           if self.state.is_in_no_fly_zone():
-                # Reset state
-                self.data_rate += 10
-                x, y = old_position
-                self.state.set_position([x, y, z])
+            z += 1
+
+        self.state.set_position([x, y, z])
+
+        if self.state.is_in_no_fly_zone():
+            # Reset to previous position if the action leads into an invalid area.
+            self.state.set_position(old_position)
 
         self.state.decrement_movement_budget()
         self.state.set_terminal(self.state.landed or (self.state.movement_budget == 0))
