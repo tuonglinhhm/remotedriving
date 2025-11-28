@@ -31,15 +31,12 @@ class UAV:
         self.speed = 0
 
     def av_data(self, av):
+        """Collect data from a vehicle or device and update coverage metrics."""
         if av == 0:
             return 1
         c = min(av, self.data - self.speed)
         self.speed += c
         self.energy -= CONST_REDUCE
-        
-        if(self. position - av.position <1 )
-           if(av.signal >=1)
-                  self.coverage +=1
 
         return c / av
 

@@ -69,7 +69,7 @@ class Physics(GridPhysics):
         return idx
 
     def get_example_action(self):
-        return GridActions.HOVER
+        return GridActions.STEP1
 
     def is_in_vulnerable_cell(self):
         return self.state.is_in_vulnerable_cell()

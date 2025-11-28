@@ -5,7 +5,7 @@ from src.base.BaseState import BaseState
 
 
 class State(BaseState):
-    def __init__(self, map_init: Map, num_agents: int, multi_agent: bool):
+    def __init__(self, map_init: Map, num_agents: int, multi_agent: bool, base_station_position=(0, 0, 0)):
         super().__init__(map_init)
         self.device_list = None
         self.device_map = None  # Floating point sparse matrix showing devices and their data to be collected
@@ -15,11 +15,14 @@ class State(BaseState):
         self.multi_agent = multi_agent
 
 
-        self.positions = [[0, 0]] * num_agents
+        self.positions = [self._normalize_position([0, 0, 0])] * num_agents
         self.movement_budgets = [0] * num_agents
         self.landeds = [False] * num_agents
         self.terminals = [False] * num_agents
         self.device_coms = [-1] * num_agents
+
+        self.base_station_position = np.array(base_station_position, dtype=float)
+        self.transmit_power = 0.0
 
         self.initial_movement_budgets = [0] * num_agents
         self.initial_total_data = 0
@@ -60,7 +63,7 @@ class State(BaseState):
         self.landeds[self.active_agent] = landed
 
     def set_position(self, position):
-        self.positions[self.active_agent] = position
+        self.positions[self.active_agent] = self._normalize_position(position)
 
     def decrement_movement_budget(self):
         self.movement_budgets[self.active_agent] -= 1
@@ -70,6 +73,22 @@ class State(BaseState):
 
     def set_device_com(self, device_com):
         self.device_coms[self.active_agent] = device_com
+
+    def _normalize_position(self, position):
+        """Ensure positions are always stored as 3D coordinates."""
+        if len(position) == 2:
+            x, y = position
+            return [x, y, 0]
+        x, y, z = position
+        return [x, y, z]
+
+    @property
+    def position_2d(self):
+        return self.position[:2]
+
+    @property
+    def altitude(self):
+        return self.position[2] if len(self.position) > 2 else 0
 
     def get_active_agent(self):
         return self.active_agent
@@ -197,3 +216,55 @@ class State(BaseState):
                 uavs[k * 4 + 2] = self.movement_budgets[k]
                 uavs[k * 4 + 3] = not self.terminals[k]
         return uavs
+
+    def get_distance_to_base_station(self):
+        pos = np.array(self.position, dtype=float)
+        bs = self.base_station_position
+        if bs.shape[0] == 2:
+            bs = np.append(bs, 0)
+        return float(np.linalg.norm(pos - bs))
+
+    def get_distance_to_served_vehicle(self):
+        if not self.device_list or self.device_coms[self.active_agent] == -1:
+            return float('inf')
+        target_device = self.device_list.get_device(self.device_coms[self.active_agent])
+        device_pos = np.array(self._normalize_position(target_device.position), dtype=float)
+        return float(np.linalg.norm(np.array(self.position, dtype=float) - device_pos))
+
+    def is_serving(self):
+        return self.device_coms[self.active_agent] != -1
+
+    @property
+    def coverage(self):
+        return self.is_serving()
+
+    def get_connectivity_indicator(self, bs_threshold):
+        return float(self.get_distance_to_base_station() <= bs_threshold)
+
+    def get_service_coverage_flag(self):
+        return float(self.is_serving())
+
+    def get_vehicle_locations(self):
+        if not self.device_list:
+            return []
+        return [self._normalize_position(device.position) for device in self.device_list.devices]
+
+    def get_state_space(self, bs_threshold, service_threshold):
+        """
+        Construct the full state space vector (Definition 6) with the current UAV as reference.
+        """
+        return {
+            's1': np.array(self.position, dtype=float),
+            's2': float(self.movement_budget),
+            's3': {
+                'uav_collision': float(self.is_occupied()),
+                'obstacle_collision': float(self.is_in_no_fly_zone())
+            },
+            's4': self.get_distance_to_base_station(),
+            's5': float(self.transmit_power),
+            's6': self.get_connectivity_indicator(bs_threshold),
+            's7': self.get_distance_to_served_vehicle(),
+            's8': self.get_service_coverage_flag(),
+            's9': self.get_vehicle_locations(),
+            'service_threshold': service_threshold,
+        }
